@@ -19,11 +19,15 @@ namespace DeviceManagerLKDS.Classes
         public static string log_output;
 
         public byte[] setOfBytes;
-        List<byte> rawData = new List<byte>();
-        static List<byte[]> bytePackets = new List<byte[]>();
+        public List<byte> rawData = new List<byte>();
+        public List<byte[]> bytePackets = new List<byte[]>();
+        
+        const int checker = 0x01;
+
+        object locker = new object();
 
         public SerialPort port = null;
-        public DataReader(string portName, byte[] data)
+        public DataReader(string portName)//, byte[] data)
         {
             try
             {
@@ -33,48 +37,33 @@ namespace DeviceManagerLKDS.Classes
 
                 port.DataReceived += new SerialDataReceivedEventHandler(PackageSeeker);
                 port.Open();
-                byte[] CRC = new byte[2];
-
-                CRC = ModbusCRC16Calc(data, data.Length - 2);
-                data[data.Length - 2] = CRC[CRC.Length - 2];
-                data[data.Length - 1] = CRC[CRC.Length - 1];
-                port.Write(data, 0, data.Length);
-
-                inputBytes = ByteToString(data).ToUpper();
-                log_conStatus = $"\nОткрыто соединение с портом {portName}";
-                /*if (!port.IsOpen)
-                {
-                    
-                }
-                else
-                {
-                    port = new SerialPort(portName, 19200, Parity.None, 8, StopBits.One);
-                    port.Handshake = Handshake.None;
-
-
-                    port.DataReceived += new SerialDataReceivedEventHandler(PackageSeeker);
-                    byte[] CRC = new byte[2];
-
-                    CRC = ModbusCRC16Calc(data, data.Length - 2);
-                    data[data.Length - 2] = CRC[CRC.Length - 2];
-                    data[data.Length - 1] = CRC[CRC.Length - 1];
-                    port.Write(data, 0, data.Length);
-
-                    inputBytes = ByteToString(data).ToUpper();
-                }*/
                 
+                log_conStatus = $"\nОткрыто соединение с портом {portName}";
             }
             catch
             {
                 log_conStatus = $"\nСоединение с портом {portName} уже открыто";
             }
         }
+        public void Send(byte[] data)
+        {
+            if (!port.IsOpen)
+                return;
+            byte[] CRC = new byte[2];
 
-        public static string DeviceSeeker()
+            CRC = ModbusCRC16Calc(data, data.Length - 2);
+            data[data.Length - 2] = CRC[CRC.Length - 2];
+            data[data.Length - 1] = CRC[CRC.Length - 1];
+            port.Write(data, 0, data.Length);
+
+            inputBytes = ByteToString(data).ToUpper();
+        }
+       // public void Close() => port.Close();
+
+        /*public static string DeviceSeeker()
         {
             string bits = "";
             string outputBits = "";
-            //получаем биты
 
             foreach (byte[] set in bytePackets)
             {
@@ -99,11 +88,7 @@ namespace DeviceManagerLKDS.Classes
 
 
 
-        }
-        /*        public static List<byte[]> setData()
-                {
-                    return DataReader.bytePackets;
-                }*/
+        }*/
         
         public string ByteToString(byte[] bytes)
         {
@@ -126,7 +111,7 @@ namespace DeviceManagerLKDS.Classes
             {
                 Register = (ushort)(Register ^ data[i]);
                 for (int j = 0; j < 8; j++)
-                    if ((ushort)(Register & 0x01) == 1)
+                    if ((ushort)(Register & checker) == 1)
                     {
                         Register = (ushort)(Register >> 1);
                         Register = (ushort)(Register ^ Polynom);
@@ -143,12 +128,11 @@ namespace DeviceManagerLKDS.Classes
         
         public void PackageSeeker(object s, EventArgs e)
         {
-            int len = port.BytesToRead;
-            byte[] bytes = new byte[len];
-
-            // lock
-            lock (this)
+            lock (locker)
             {
+                int len = port.BytesToRead;
+                byte[] bytes = new byte[len];
+
                 if (port.IsOpen)
                 {
                     port.Read(bytes, 0, len);
@@ -157,36 +141,31 @@ namespace DeviceManagerLKDS.Classes
                 }
                 try
                 {
-                    if (rawData.Count > 3 && rawData.Count >= rawData[2])
+                    if ((rawData.Count > 2) && (rawData[2] + 2 <= rawData.Count - 3))
                     {
                         for (int i = 0; i < rawData.Count; i++)
                         {
-                            if (rawData[i] == 0x01 && rawData[i + 1] == 0x04)
+                            if (rawData[i] == checker && rawData[i + 1] == 0x04)//0x01 и 0x04 костыли
                             {
                                 setOfBytes = new byte[rawData[2] + 2];
-                                for (int j = 0, k = 3; j < rawData[2] + 2; j++, k++)
-                                {
-                                    setOfBytes[j] = rawData[k];
-                                }
+
+                                rawData.CopyTo(3, setOfBytes, 0, rawData[2] + 2);
                                 bytePackets.Add(setOfBytes);
                             }
                         }
-                        log_input += "\n[" + DateTime.Now + "-" + DateTime.Now.Millisecond + "] >: " + inputBytes;
-                        log_output += "\n[" + DateTime.Now + "-" + DateTime.Now.Millisecond + "] <: " + outputBytes;
+
+                        log_input = "\n\n[" + DateTime.Now + "-" + DateTime.Now.Millisecond + "] >: " + inputBytes;
+                        log_output = "\n[" + DateTime.Now + "-" + DateTime.Now.Millisecond + "] <: " + outputBytes;
                     }
                 }
                 catch { }
-                port.Close();
-                
             }
-        
-            
-
         }
         public void Disconnect()
         {
             port.Close();
-            port = null;
+            port.Dispose();
+
             //log_conStatus = $"\nЗакрыто соединение с портом {portName}";
         }
 

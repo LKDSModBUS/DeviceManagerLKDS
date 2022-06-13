@@ -9,6 +9,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
@@ -21,10 +22,9 @@ namespace DeviceManagerLKDS
         //
         // SOME VARIABLES
         //
-        int t = 1;
 
         StreamWriter logWriter = new StreamWriter("C:\\DeviceManagerLKDS\\DeviceManagerLKDS\\DeviceManagerLKDS\\Logs\\Log.txt"); // ПУТЬ
-        List<byte[]> bytePackets = new List<byte[]>();
+        int[] connectedDevices = new int[32];
         byte[] query = new byte[]
                                    {
                                         0x01,
@@ -36,28 +36,36 @@ namespace DeviceManagerLKDS
                                         0,
                                         0
                                    };
+        byte[] query2 = new byte[]
+                                   {
+                                        0x01,
+                                        0x04,
+                                        0x00,
+                                        0x00,
+                                        0x00,
+                                        0x73,
+                                        0,
+                                        0
+                                   };
+        byte[] query3 = new byte[]
+                                   {
+                                        0x01,
+                                        0x04,
+                                        0x12,
+                                        0x00, // НУЖНО 0x00
+                                        0x00,
+                                        0x01,
+                                        0,
+                                        0
+                                   };
         byte[] CRC = new byte[2];
-        byte[] clone = new byte[32];
+        byte[] clone = new byte[34];
         DataReader dr = null;
 
         //
         // MAIN
         //
      
-        public enum TestStateType
-        {
-            [Description("Начало ЦБ")]
-            Test1 = 0x01,
-            [Description("После Аппаратов безопасности")]
-            Test2 = 0x02,
-            [Description("После ДК")]
-            Test3 = 0x04,
-            [Description("После ДШ")]
-            Test4 = 0x08,
-            [Description("Конец ЦБ")]
-            Test5 = 0x10
-        }
-        TestStateType enumrdtrc = TestStateType.Test1;
 
 
         public Form1()
@@ -65,28 +73,173 @@ namespace DeviceManagerLKDS
             InitializeComponent();
             getCOMports();
         }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            /*            try
-                        {
-                            if (port.IsOpen)
-                            {
-                                rtbLog.Text += "\n[" + DateTime.Now + "-" + DateTime.Now.Millisecond + "] >: " + inputBytes;
-                                rtbLog.Text += "\n[" + DateTime.Now + "-" + DateTime.Now.Millisecond + "] <: " + outputBytes;
-                                rtbLog.SelectionStart = rtbLog.Text.Length;
-                                rtbLog.ScrollToCaret();
-                                logWriter.AutoFlush = true;
-                                logWriter.WriteLine(rtbLog.Text);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message, "Message", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
+            labelTimer.Text = i++.ToString();
+            dr.Send(query);
+            do
+            {
+                System.Threading.Thread.Sleep(10);
+            } while (dr.setOfBytes == null);
+       
+            try
+            {
+                if (clone[clone.Length - 1] != dr.setOfBytes[dr.setOfBytes.Length - 1] || clone[clone.Length - 2] != dr.setOfBytes[dr.setOfBytes.Length - 2])
+                {
+                    for (int i = 0; i < 256; i++)
+                    {
+                        int b = dr.setOfBytes[(int)(i / 8)];
+                        if ((b & (1 << (i % 8))) != 0)
+                            rtbLog.Text += $"Address {i + 7} set\n";
+                        /*                      string[] binary = dr.setOfBytes.Select(x => Convert.ToString(x, 2).PadLeft(8, '0')).ToArray();
+                                                for (int j = 0; j < binary.Length; j++)
+                                                {
+                                                    if (binary[j].Contains("1"))
+                                                    {
+                                                        binary[j]
+                                                        char[] arr = binary[j].ToCharArray();
+                                                    }
+                                                }*/
+                        //byte val = dr.setOfBytes[i / 8]; //НЕВЕРНО ОТОБРАЖАЕТ 1-БИТЫ
+                        //int a1 = dr.setOfBytes[val];
+                        //int a2 = (1 << (i % 8));
+                        //int b = a1 & a2;
 
-            */
-            timer1.Enabled = !timer1.Enabled;
+                        //if (b != 0)
+                        //{
+                        //    bits.Add(i);
+                        //}
+
+                        /* if (clone[i] != dr.setOfBytes[i])
+                         {
+
+                             *//*foreach (AdressTest value in Enum.GetValues(typeof(AdressTest)))
+                             {
+                                 if (dr.setOfBytes[i] == (byte)value)
+                                 {
+                                     //split()
+                                     *//*string title = "Page " + value.GetNameOfEnum();
+                                     TabPage newPage = new TabPage(title);
+                                     mainTabControl.TabPages.Add(newPage);
+                                     rtbLog.Text += $"\nСоздана страница {value.GetNameOfEnum()}";
+                                     clone = dr.setOfBytes;*//*
+                                 }
+                             }*//*
+                         }*/
+
+                    }
+                    /*int adress = 0x1200 + 0x0010 * i;
+                    byte[] array = new byte[]
+                    {
+                            (byte)adress,
+                            Convert.ToByte(adress>>8)
+                    };
+                    Union16 var = new Union16();
+                    var.Byte0 = array[0];
+                    var.Byte1 = array[1];
+                    query3[2] = var.Byte0;
+                    query3[3] = var.Byte1;
+
+                    dr = new DataReader(cbConnectedPorts.SelectedItem.ToString(), query3);
+                    lock (locker)
+                    {
+                        string title = "";
+                        foreach (byte[] set in DataReader.bytePackets)
+                        {
+
+                            title = dr.ByteToString(set);
+                            char[] titl = title.Replace(" ", "").ToCharArray();
+                            CAN_Devices type = (CAN_Devices)titl[3];
+
+                            title = type.GetNameOfEnum();
+
+                        }
+                        TabPage newPage = new TabPage(title);
+                        mainTabControl.TabPages.Add(newPage);
+                        rtbLog.Text += $"\nСоздана страница {title}";
+                    }*/
+                }
+            }
+            catch
+            {
+            }
+            //lock (locker)
+            //{
+            //    rtbLog.Text += DataReader.log_input;
+            //    rtbLog.Text += DataReader.log_output;
+            //    DataReader.log_output = "";
+            //    DataReader.log_input = "";
+            //    //rtbLog.Text += "\nBITS: " + DataReader.DeviceSeeker();
+            //    rtbLog.SelectionStart = rtbLog.Text.Length;
+            //    rtbLog.ScrollToCaret();
+            //    logWriter.AutoFlush = true;
+            //    logWriter.Write(rtbLog.Text);
+            //}
+
+            //if (mainTabControl.SelectedIndex == 0)
+            //{
+            //    dr = new DataReader(cbConnectedPorts.SelectedItem.ToString());
+            //    lock (locker)
+            //    {
+            //        rtbLog.Text += DataReader.log_input;
+            //        rtbLog.Text += DataReader.log_output;
+            //        DataReader.log_output = "";
+            //        DataReader.log_input = "";
+            //        //rtbLog.Text += "\nBITS: " + DataReader.DeviceSeeker();
+            //        rtbLog.SelectionStart = rtbLog.Text.Length;
+            //        rtbLog.ScrollToCaret();
+            //        logWriter.AutoFlush = true;
+            //        logWriter.Write(rtbLog.Text);
+            //    }
+
+            //}
+            //else
+            //{
+            //    foreach (int bit in bits)
+            //    {
+            //        if (mainTabControl.SelectedIndex == bit)
+            //        {
+
+
+            //            rtbLog.Text += DataReader.log_input;
+            //            rtbLog.Text += DataReader.log_output;
+            //            DataReader.log_output = "";
+            //            DataReader.log_input = "";
+            //            //rtbLog.Text += "\nBITS: " + DataReader.DeviceSeeker();
+            //            rtbLog.SelectionStart = rtbLog.Text.Length;
+            //            rtbLog.ScrollToCaret();
+            //            logWriter.AutoFlush = true;
+            //            logWriter.Write(rtbLog.Text);
+
+            //        }
+            //    }
+            //}
+
+
+
+
+            /*  byte[] output = dr.PortWrite(query);
+              if (clone != output)
+              {
+                  rtbLog.Text += DataReader.log_input;
+                  rtbLog.Text += DataReader.log_output;
+                  foreach (var i in output)
+                  {
+                      if (output[i] != 00 && i != 0)
+                      {
+                          string title = "Page " + output[i];
+                          TabPage newPage = new TabPage(title);
+                          mainTabControl.TabPages.Add(newPage);
+                          rtbLog.Text += $"\nСоздана страница {title}";
+                      }
+                  }
+              }
+              clone = output;*/
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -110,7 +263,9 @@ namespace DeviceManagerLKDS
                 {
                     if (i == cbConnectedPorts.SelectedIndex)
                     {
-                        timer1.Enabled = true;
+                        dr = new DataReader(cbConnectedPorts.SelectedItem.ToString());
+
+                        timer1.Start();
                     }
                 }
                 if (cbConnectedPorts.Text == "")
@@ -157,79 +312,184 @@ namespace DeviceManagerLKDS
 
         }
 
-        private void button3_Click(object sender, EventArgs e)
+/*        private void button3_Click(object sender, EventArgs e)
         {
             rtbLog.Text += DataReader.log_input;
             rtbLog.Text += DataReader.log_output;
-            rtbLog.Text += "BITS: " + DataReader.DeviceSeeker();
+            *//*rtbLog.Text += "BITS: " + DataReader.DeviceSeeker();*//*
             rtbLog.SelectionStart = rtbLog.Text.Length;
             rtbLog.ScrollToCaret();
             logWriter.AutoFlush = true;
             logWriter.Write(rtbLog.Text);
-        }
+        }*/
+
+
         int i = 0;
+        object locker = new object();
+
+        void ThreadCurrentDeviceInfo()
+        {
+            lock (locker)
+            {
+                
+                Thread.Sleep(1);
+
+            }
+
+        }
         private void timer1_Tick(object sender, EventArgs e)
         {
+            timer1.Stop();
             labelTimer.Text = i++.ToString();
-            dr = new DataReader(cbConnectedPorts.SelectedItem.ToString(), query);
-            rtbLog.Text += DataReader.log_input;
-            rtbLog.Text += DataReader.log_output;
+            Thread deviceInfo_thread = new Thread(ThreadCurrentDeviceInfo);
+            if ( i % 3 == 0)
+            {
+
+            } 
+            if ( i % 15 == 0)
+            {
+
+            }
+
+            try
+            {
+                while (dr.setOfBytes.Length != 4)
+                {
+                    dr.setOfBytes = null;
+                }
+            }
+            catch { }
+
+            dr.setOfBytes = null;
+            dr.rawData = new List<byte>();
+            dr.bytePackets = new List<byte[]>();
+
+            dr.Send(query);
+            rtbLog.Text += DataReader.log_input + DataReader.log_output;
+            dr.outputBytes = "";
             rtbLog.SelectionStart = rtbLog.Text.Length;
             rtbLog.ScrollToCaret();
             logWriter.AutoFlush = true;
             logWriter.Write(rtbLog.Text);
 
-            if (clone[0] != null && clone[clone.Length-1] != dr.setOfBytes[dr.setOfBytes.Length-1] && clone[clone.Length - 2] != dr.setOfBytes[dr.setOfBytes.Length - 2]) 
+            while (dr.setOfBytes == null)
             {
-                for (int i = 0; i < dr.setOfBytes.Length; i++)
+
+            }
+
+            try 
+            {
+                //rtbLog.Text += "\n До условия";
+                for (int c = 0; c < dr.setOfBytes.Length; c++) {}
+                if (clone[clone.Length - 1] != dr.setOfBytes[dr.setOfBytes.Length - 1] || clone[clone.Length - 2] != dr.setOfBytes[dr.setOfBytes.Length - 2])
                 {
-                    foreach (TestStateType value in Enum.GetValues(typeof(AdressTest)))
+                    //rtbLog.Text += "\n После условия";
+                    /*for (int c = 0; c < dr.setOfBytes.Length; c++)
                     {
-                        if (dr.setOfBytes[i] == (byte)value)
+                        clone[c] = dr.setOfBytes[c];
+                        rtbLog.Text += $"\n {clone[c]}    -    {dr.setOfBytes[c]}";
+
+                    }*/
+                    Array.Copy(dr.setOfBytes, clone, 34);
+                    List<int> bits = new List<int>();
+                    for (int i = 0; i < 256; i++)
+                    {
+                        int b = dr.setOfBytes[(int)(i / 8)];
+                        if (((b & (1 << (i % 8))) != 0) && i >= 32)
                         {
-                            string title = "Page " + value;
-                            TabPage newPage = new TabPage(title);
-                            mainTabControl.TabPages.Add(newPage);
-                            rtbLog.Text += $"\nСоздана страница {value}";
-                            clone = dr.setOfBytes;
+                            bits.Add(i);
+                            
                         }
                     }
+
+                    for (int p = 0; connectedDevices[p] != 0; p++)
+                    {
+                        connectedDevices[p] = 0; //обнуление списка подключённых устройств и вкладок
+                       // mainTabControl.TabPages.RemoveAt(p+1);
+                    }
+                    mainTabControl.TabPages.Clear();
+                    TabPage lbPage = new TabPage("ЛБ Концентратор");
+                    mainTabControl.TabPages.Add(lbPage);
+
+                    for (int i = 0, j = 0; i < bits.Count; i++)
+                    {
+                        dr.setOfBytes = null;
+                        dr.rawData = new List<byte>();
+                        dr.bytePackets = new List<byte[]>();
+                        int adress = 0x1200 + 0x0010 * Math.Abs((bits[i] - 32));
+                        byte[] array = new byte[]
+                        {
+                           (byte)adress,
+                           Convert.ToByte(adress>>8)
+                        };
+                        Union16 var = new Union16();
+                        var.Byte0 = array[0];
+                        var.Byte1 = array[1];
+                        query3[2] = var.Byte1;
+                        query3[3] = var.Byte0;
+
+                        /*deviceInfo_thread.Start();*/
+
+                        dr.Send(query3);
+                        
+                        while (dr.setOfBytes == null)
+                        {
+
+                        }
+
+                        rtbLog.Text += DataReader.log_input + DataReader.log_output;
+                        dr.outputBytes = "";
+                        rtbLog.SelectionStart = rtbLog.Text.Length;
+                        rtbLog.ScrollToCaret();
+                        logWriter.AutoFlush = true;
+                        logWriter.Write(rtbLog.Text);
+
+
+
+                        if (dr.setOfBytes[1] != 255)
+                        {
+                            connectedDevices[j] = dr.setOfBytes[1];
+                            j++;
+                        }
+                    }
+                    rtbLog.Text += "\n\n----------------\nПодключенные устройства:\n";
+                    for (int o = 0; o < connectedDevices.Length; o++)
+                    {
+                        if (connectedDevices[o] != 0)
+                        {
+
+                            foreach (CAN_Devices value in Enum.GetValues(typeof(CAN_Devices)))
+                            {
+                                if (connectedDevices[o] == (byte)value)
+                                {
+                                    TabPage newPage = new TabPage(value.GetNameOfEnum());
+                                    mainTabControl.TabPages.Add(newPage);
+                                    rtbLog.Text += $"\n{connectedDevices[o]} - {value.GetNameOfEnum()}";
+                                }
+                            }
+                        }
+                    }
+                    rtbLog.Text += "\n----------------\n";
                 }
+
             }
-            
+            catch { }
+            timer1.Start();
 
-
-            /*  byte[] output = dr.PortWrite(query);
-              if (clone != output)
-              {
-                  rtbLog.Text += DataReader.log_input;
-                  rtbLog.Text += DataReader.log_output;
-                  foreach (var i in output)
-                  {
-                      if (output[i] != 00 && i != 0)
-                      {
-                          string title = "Page " + output[i];
-                          TabPage newPage = new TabPage(title);
-                          mainTabControl.TabPages.Add(newPage);
-                          rtbLog.Text += $"\nСоздана страница {title}";
-                      }
-                  }
-              }
-              clone = output;*/
         }
 
         private struct DEV_BROADCAST_HDR
         {
             //отключаем предупреждения компилятора для ошибки 0649
-#pragma warning disable 0649
+        #pragma warning disable 0649
             internal UInt32 dbch_size;
             internal UInt32 dbch_devicetype;
             internal UInt32 dbch_reserved;
             //включаем предупреждения компилятора для ошибки 0649
-#pragma warning restore 0649
+        #pragma warning restore 0649
         };
 
-/*        protected override void WndProc(ref Message m)
+        protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
             if (m.Msg == 0x0219)
@@ -254,11 +514,8 @@ namespace DeviceManagerLKDS
                         }
                         break;
                 }
-
-
             }
-
-        }*/
+        }
         public void getCOMports()
         {
             try
@@ -280,5 +537,15 @@ namespace DeviceManagerLKDS
             labelTimer.Text = mainTabControl.SelectedIndex.ToString();
         }
 
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+
+            dr?.Disconnect();
+        }
+
+        private void clearbutton_Click(object sender, EventArgs e)
+        {
+            rtbLog.Text = "";
+        }
     }
 }
