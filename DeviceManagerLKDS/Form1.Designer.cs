@@ -43,6 +43,7 @@ namespace DeviceManagerLKDS
             this.labelTimer = new System.Windows.Forms.Label();
             this.clearbutton = new System.Windows.Forms.Button();
             this.mainTabControl = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.rtbLog = new System.Windows.Forms.RichTextBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.button4 = new System.Windows.Forms.Button();
@@ -52,7 +53,6 @@ namespace DeviceManagerLKDS
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.tabPage1 = new System.Windows.Forms.TabPage();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -69,7 +69,7 @@ namespace DeviceManagerLKDS
             this.cbConnectedPorts.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.cbConnectedPorts.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.cbConnectedPorts.FormattingEnabled = true;
-            this.cbConnectedPorts.Location = new System.Drawing.Point(172, 96);
+            this.cbConnectedPorts.Location = new System.Drawing.Point(171, 96);
             this.cbConnectedPorts.Name = "cbConnectedPorts";
             this.cbConnectedPorts.Size = new System.Drawing.Size(279, 21);
             this.cbConnectedPorts.TabIndex = 7;
@@ -87,7 +87,7 @@ namespace DeviceManagerLKDS
             this.deviceNameLb.AutoSize = true;
             this.deviceNameLb.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.deviceNameLb.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.deviceNameLb.Location = new System.Drawing.Point(172, 0);
+            this.deviceNameLb.Location = new System.Drawing.Point(171, 0);
             this.deviceNameLb.Name = "deviceNameLb";
             this.deviceNameLb.Size = new System.Drawing.Size(192, 24);
             this.deviceNameLb.TabIndex = 3;
@@ -99,7 +99,7 @@ namespace DeviceManagerLKDS
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.button1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.button1.Location = new System.Drawing.Point(476, 96);
+            this.button1.Location = new System.Drawing.Point(475, 96);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(97, 47);
             this.button1.TabIndex = 4;
@@ -143,7 +143,7 @@ namespace DeviceManagerLKDS
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 64.29448F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 103F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 108F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 334F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 335F));
             this.tableLayoutPanel2.Controls.Add(this.bDisconnectPort, 4, 1);
             this.tableLayoutPanel2.Controls.Add(this.pictureBox1, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.button2, 3, 1);
@@ -168,7 +168,7 @@ namespace DeviceManagerLKDS
             this.bDisconnectPort.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.bDisconnectPort.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.bDisconnectPort.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.bDisconnectPort.Location = new System.Drawing.Point(687, 96);
+            this.bDisconnectPort.Location = new System.Drawing.Point(686, 96);
             this.bDisconnectPort.Name = "bDisconnectPort";
             this.bDisconnectPort.Size = new System.Drawing.Size(89, 47);
             this.bDisconnectPort.TabIndex = 6;
@@ -182,7 +182,7 @@ namespace DeviceManagerLKDS
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.button2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.button2.Location = new System.Drawing.Point(579, 96);
+            this.button2.Location = new System.Drawing.Point(578, 96);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(102, 47);
             this.button2.TabIndex = 5;
@@ -192,13 +192,12 @@ namespace DeviceManagerLKDS
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(476, 3);
+            this.button3.Location = new System.Drawing.Point(475, 3);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 7;
             this.button3.Text = "button3";
             this.button3.UseVisualStyleBackColor = true;
-            //this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // labelTimer
             // 
@@ -212,7 +211,7 @@ namespace DeviceManagerLKDS
             // 
             // clearbutton
             // 
-            this.clearbutton.Location = new System.Drawing.Point(579, 3);
+            this.clearbutton.Location = new System.Drawing.Point(578, 3);
             this.clearbutton.Name = "clearbutton";
             this.clearbutton.Size = new System.Drawing.Size(75, 23);
             this.clearbutton.TabIndex = 9;
@@ -230,6 +229,15 @@ namespace DeviceManagerLKDS
             this.mainTabControl.Size = new System.Drawing.Size(1021, 603);
             this.mainTabControl.TabIndex = 6;
             this.mainTabControl.SelectedIndexChanged += new System.EventHandler(this.mainTabControl_SelectedIndexChanged);
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Size = new System.Drawing.Size(1013, 577);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "ЛБ Концентратор";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // rtbLog
             // 
@@ -330,15 +338,6 @@ namespace DeviceManagerLKDS
             // 
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(1013, 577);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "ЛБ Концентратор";
-            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 

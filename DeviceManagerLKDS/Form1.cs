@@ -322,7 +322,7 @@ namespace DeviceManagerLKDS
         {
             timer1.Stop();
             labelTimer.Text = i++.ToString();
-            /*if (i % 3 == 0)
+            if (i % 3 == 0)
             {
                 if (mainTabControl.SelectedIndex != 0)
                 {
@@ -340,42 +340,41 @@ namespace DeviceManagerLKDS
                     query3[query.Length - 3] = 16;
                     SendQuery(query3);
                 }
-            }*/
-            /*if (i % 15 == 0)
+            }
+            if (i % 15 == 0)
             {
                 if (mainTabControl.SelectedIndex == 0)
                 {
                     SendQuery(query2);
                 }
-            }*/
-            SendQuery(query2);
-/*            try
+            }
+            try
             {
                 while (dr.setOfBytes.Length != 4)
                 {
                     dr.setOfBytes = null;
                 }
             }
-            catch { }*/
+            catch { }
 
 
 
-/*            dr.setOfBytes = null;
+            dr.setOfBytes = null;
             dr.rawData = new List<byte>();
-            dr.bytePackets = new List<byte[]>();*/
+            dr.bytePackets = new List<byte[]>();
 
             rtbLog.Text += $"\nВыбранная вкладка{mainTabControl.TabPages[mainTabControl.SelectedIndex].Text}";
 
-/*            SendQuery(query);*/
+            SendQuery(query);
 
             while (dr.setOfBytes == null)
             {
 
             }
 
-            /*try 
+            try
             {
-                for (int c = 0; c < dr.setOfBytes.Length; c++) {}
+                for (int c = 0; c < dr.setOfBytes.Length; c++) { }
                 if (clone[clone.Length - 1] != dr.setOfBytes[dr.setOfBytes.Length - 1] || clone[clone.Length - 2] != dr.setOfBytes[dr.setOfBytes.Length - 2])
                 {
 
@@ -387,7 +386,7 @@ namespace DeviceManagerLKDS
                         if (((b & (1 << (i % 8))) != 0) && i >= 32)
                         {
                             bits.Add(i);
-                            
+
                         }
                     }
 
@@ -440,7 +439,7 @@ namespace DeviceManagerLKDS
                                 if (connectedDevices[o] == (byte)value)
                                 {
                                     TabPage newPage = new TabPage(value.GetNameOfEnum());
-                                    newPage.Name = $"{connectedDevices[o+1]}"; 
+                                    newPage.Name = $"{connectedDevices[o + 1]}";
                                     mainTabControl.TabPages.Add(newPage);
                                     rtbLog.Text += $"\n{connectedDevices[o]} - {value.GetNameOfEnum()}. Адрес CAN: {newPage.Name}";
                                 }
@@ -451,7 +450,7 @@ namespace DeviceManagerLKDS
                 }
 
             }
-            catch { }*/
+            catch { }
 
             timer1.Start();
 
