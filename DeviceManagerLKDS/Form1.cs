@@ -244,9 +244,6 @@ namespace DeviceManagerLKDS
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string title = "Page " + (mainTabControl.TabCount + 1).ToString();
-            TabPage myTabPage = new TabPage(title);
-            mainTabControl.TabPages.Add(myTabPage);
         }
 
         //
@@ -321,52 +318,12 @@ namespace DeviceManagerLKDS
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Stop();
+
             labelTimer.Text = i++.ToString();
-            if (i % 3 == 0)
-            {
-                if (mainTabControl.SelectedIndex != 0)
-                {
-                    int adress = 0x1200 + 0x0010 * Math.Abs((Convert.ToInt32(mainTabControl.SelectedTab.Name) - 32));
-                    byte[] array = new byte[]
-                    {
-                           (byte)adress,
-                           Convert.ToByte(adress>>8)
-                    };
-                    Union16 var = new Union16();
-                    var.Byte0 = array[0];
-                    var.Byte1 = array[1];
-                    query3[2] = var.Byte1;
-                    query3[3] = var.Byte0;
-                    query3[query.Length - 3] = 16;
-                    SendQuery(query3);
-                }
-            }
-            if (i % 15 == 0)
-            {
-                if (mainTabControl.SelectedIndex == 0)
-                {
-                    SendQuery(query2);
-                }
-            }
-            try
-            {
-                while (dr.setOfBytes.Length != 4)
-                {
-                    dr.setOfBytes = null;
-                }
-            }
-            catch { }
-
-
-
             dr.setOfBytes = null;
             dr.rawData = new List<byte>();
             dr.bytePackets = new List<byte[]>();
-
-            rtbLog.Text += $"\nВыбранная вкладка{mainTabControl.TabPages[mainTabControl.SelectedIndex].Text}";
-
             SendQuery(query);
-
             while (dr.setOfBytes == null)
             {
 
@@ -394,9 +351,6 @@ namespace DeviceManagerLKDS
                     {
                         connectedDevices[p] = 0; //обнуление списка подключённых устройств и вкладок
                     }
-                    mainTabControl.TabPages.Clear();
-                    TabPage lbPage = new TabPage("ЛБ Концентратор");
-                    mainTabControl.TabPages.Add(lbPage);
 
                     for (int i = 0, j = 0; i < bits.Count; i++)
                     {
@@ -414,7 +368,7 @@ namespace DeviceManagerLKDS
                         var.Byte1 = array[1];
                         query3[2] = var.Byte1;
                         query3[3] = var.Byte0;
-                        query3[query.Length - 3] = 0;
+                        query3[query.Length - 3] = 1;
 
 
                         SendQuery(query3);
@@ -438,10 +392,9 @@ namespace DeviceManagerLKDS
                             {
                                 if (connectedDevices[o] == (byte)value)
                                 {
-                                    TabPage newPage = new TabPage(value.GetNameOfEnum());
-                                    newPage.Name = $"{connectedDevices[o + 1]}";
-                                    mainTabControl.TabPages.Add(newPage);
-                                    rtbLog.Text += $"\n{connectedDevices[o]} - {value.GetNameOfEnum()}. Адрес CAN: {newPage.Name}";
+                                    cbAllDevices.Items.Add(connectedDevices[o + 1]);
+                                    rtbLog.Text += $"\n{connectedDevices[o]} - {value.GetNameOfEnum()}. Адрес CAN: {connectedDevices[o + 1]}";
+                                    break;
                                 }
                             }
                         }
@@ -451,7 +404,27 @@ namespace DeviceManagerLKDS
 
             }
             catch { }
+            try
+            {
+                if (Convert.ToInt32(cbAllDevices.SelectedIndex) == -1)
+                {
+                    cbAllDevices.SelectedIndex = 0;
+                }
+                if (i % 3 == 0)
+                {
+                    SendQuery(query3);
+                }
+            }
+            catch  { }
 
+            if (Convert.ToInt32(labelTimer.Text) % 3 == 0 && Convert.ToInt32(labelTimer.Text) != 0)
+            {
+                labelTimer.ForeColor = Color.Red;
+            }
+            else
+            {
+                labelTimer.ForeColor = Color.White;
+            }
             timer1.Start();
 
         }
@@ -524,6 +497,50 @@ namespace DeviceManagerLKDS
         private void clearbutton_Click(object sender, EventArgs e)
         {
             rtbLog.Text = "";
+        }
+
+        private void cbAllDevices_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            dr.setOfBytes = null;
+            dr.rawData = new List<byte>();
+            dr.bytePackets = new List<byte[]>();
+            int adress = 0x1200 + 0x0010 * Math.Abs((Convert.ToInt32(cbAllDevices.SelectedItem.ToString()) - 32));
+            byte[] array = new byte[]
+            {
+                           (byte)adress,
+                           Convert.ToByte(adress>>8)
+            };
+            Union16 var = new Union16();
+            var.Byte0 = array[0];
+            var.Byte1 = array[1];
+            query3[2] = var.Byte1;
+            query3[3] = var.Byte0;
+            query3[query.Length - 3] = 16;
+
+
+
+
+
+           
+
+            for (int i = 0; connectedDevices[i] != 0; i++)
+            {
+                if (connectedDevices[i] == Convert.ToInt32(cbAllDevices.SelectedItem))
+                {
+                    foreach (CAN_Devices value in Enum.GetValues(typeof(CAN_Devices)))
+                    {
+                        if (connectedDevices[i-1] == (int)value)
+                        {
+                            deviceNameLb.Text = $"{connectedDevices[i]} - {value.GetNameOfEnum()}";
+                            mainTabControl.SelectedTab.Text = $"{value.GetNameOfEnum()}";
+                            break;
+                        }
+                        
+                    }
+                }
+            }
+
+
         }
     }
 }

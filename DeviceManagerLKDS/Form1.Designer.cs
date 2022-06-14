@@ -53,6 +53,7 @@ namespace DeviceManagerLKDS
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.cbAllDevices = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -101,9 +102,9 @@ namespace DeviceManagerLKDS
             this.button1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.button1.Location = new System.Drawing.Point(475, 96);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(97, 47);
+            this.button1.Size = new System.Drawing.Size(97, 66);
             this.button1.TabIndex = 4;
-            this.button1.Text = "Проверка подключения";
+            this.button1.Text = "ОТПРАВИТЬ ЗАПРО ДЛЯ ЛЕРЫ";
             this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -153,6 +154,7 @@ namespace DeviceManagerLKDS
             this.tableLayoutPanel2.Controls.Add(this.button3, 2, 0);
             this.tableLayoutPanel2.Controls.Add(this.labelTimer, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.clearbutton, 3, 0);
+            this.tableLayoutPanel2.Controls.Add(this.cbAllDevices, 4, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -339,6 +341,15 @@ namespace DeviceManagerLKDS
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // cbAllDevices
+            // 
+            this.cbAllDevices.FormattingEnabled = true;
+            this.cbAllDevices.Location = new System.Drawing.Point(686, 3);
+            this.cbAllDevices.Name = "cbAllDevices";
+            this.cbAllDevices.Size = new System.Drawing.Size(221, 21);
+            this.cbAllDevices.TabIndex = 10;
+            this.cbAllDevices.SelectedIndexChanged += new System.EventHandler(this.cbAllDevices_SelectedIndexChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -391,6 +402,7 @@ namespace DeviceManagerLKDS
         private System.Windows.Forms.Label labelTimer;
         private System.Windows.Forms.Button clearbutton;
         private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.ComboBox cbAllDevices;
     }
 }
 
