@@ -24,7 +24,7 @@ namespace DeviceManagerLKDS
         //
 
         StreamWriter logWriter = new StreamWriter("C:\\DeviceManagerLKDS\\DeviceManagerLKDS\\DeviceManagerLKDS\\Logs\\Log.txt"); // ПУТЬ
-        int[] connectedDevices = new int[32];
+        int[] connectedDevices = new int[64];
         byte[] query = new byte[]
                                    {
                                         0x01,
@@ -300,96 +300,85 @@ namespace DeviceManagerLKDS
             rtbLog.ScrollToCaret();
             logWriter.AutoFlush = true;
             logWriter.Write(rtbLog.Text);
-            /*            foreach (byte[] set in bytePackets)
-                        {
-                            string path2 = $@"C:\Users\Prometheus\Desktop\lift{count}.log.txt"; // ПУТЬ
-
-                            File.WriteAllBytes(path2, set);
-                            count++;
-                            break;
-                        }*/
-
 
         }
-
-/*        private void button3_Click(object sender, EventArgs e)
-        {
-            rtbLog.Text += DataReader.log_input;
-            rtbLog.Text += DataReader.log_output;
-            *//*rtbLog.Text += "BITS: " + DataReader.DeviceSeeker();*//*
-            rtbLog.SelectionStart = rtbLog.Text.Length;
-            rtbLog.ScrollToCaret();
-            logWriter.AutoFlush = true;
-            logWriter.Write(rtbLog.Text);
-        }*/
-
-
         int i = 0;
-        object locker = new object();
 
-        void ThreadCurrentDeviceInfo()
+        void SendQuery(byte[] query)
         {
-            lock (locker)
-            {
-                
-                Thread.Sleep(1);
-
-            }
-
-        }
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            timer1.Stop();
-            labelTimer.Text = i++.ToString();
-            Thread deviceInfo_thread = new Thread(ThreadCurrentDeviceInfo);
-            if ( i % 3 == 0)
-            {
-
-            } 
-            if ( i % 15 == 0)
-            {
-
-            }
-
-            try
-            {
-                while (dr.setOfBytes.Length != 4)
-                {
-                    dr.setOfBytes = null;
-                }
-            }
-            catch { }
-
-            dr.setOfBytes = null;
-            dr.rawData = new List<byte>();
-            dr.bytePackets = new List<byte[]>();
-
             dr.Send(query);
+            while (dr.setOfBytes == null)
+            {
+
+            }
             rtbLog.Text += DataReader.log_input + DataReader.log_output;
             dr.outputBytes = "";
             rtbLog.SelectionStart = rtbLog.Text.Length;
             rtbLog.ScrollToCaret();
             logWriter.AutoFlush = true;
             logWriter.Write(rtbLog.Text);
+        }
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            timer1.Stop();
+            labelTimer.Text = i++.ToString();
+            /*if (i % 3 == 0)
+            {
+                if (mainTabControl.SelectedIndex != 0)
+                {
+                    int adress = 0x1200 + 0x0010 * Math.Abs((Convert.ToInt32(mainTabControl.SelectedTab.Name) - 32));
+                    byte[] array = new byte[]
+                    {
+                           (byte)adress,
+                           Convert.ToByte(adress>>8)
+                    };
+                    Union16 var = new Union16();
+                    var.Byte0 = array[0];
+                    var.Byte1 = array[1];
+                    query3[2] = var.Byte1;
+                    query3[3] = var.Byte0;
+                    query3[query.Length - 3] = 16;
+                    SendQuery(query3);
+                }
+            }*/
+            /*if (i % 15 == 0)
+            {
+                if (mainTabControl.SelectedIndex == 0)
+                {
+                    SendQuery(query2);
+                }
+            }*/
+            SendQuery(query2);
+/*            try
+            {
+                while (dr.setOfBytes.Length != 4)
+                {
+                    dr.setOfBytes = null;
+                }
+            }
+            catch { }*/
+
+
+
+/*            dr.setOfBytes = null;
+            dr.rawData = new List<byte>();
+            dr.bytePackets = new List<byte[]>();*/
+
+            rtbLog.Text += $"\nВыбранная вкладка{mainTabControl.TabPages[mainTabControl.SelectedIndex].Text}";
+
+/*            SendQuery(query);*/
 
             while (dr.setOfBytes == null)
             {
 
             }
 
-            try 
+            /*try 
             {
-                //rtbLog.Text += "\n До условия";
                 for (int c = 0; c < dr.setOfBytes.Length; c++) {}
                 if (clone[clone.Length - 1] != dr.setOfBytes[dr.setOfBytes.Length - 1] || clone[clone.Length - 2] != dr.setOfBytes[dr.setOfBytes.Length - 2])
                 {
-                    //rtbLog.Text += "\n После условия";
-                    /*for (int c = 0; c < dr.setOfBytes.Length; c++)
-                    {
-                        clone[c] = dr.setOfBytes[c];
-                        rtbLog.Text += $"\n {clone[c]}    -    {dr.setOfBytes[c]}";
 
-                    }*/
                     Array.Copy(dr.setOfBytes, clone, 34);
                     List<int> bits = new List<int>();
                     for (int i = 0; i < 256; i++)
@@ -405,7 +394,6 @@ namespace DeviceManagerLKDS
                     for (int p = 0; connectedDevices[p] != 0; p++)
                     {
                         connectedDevices[p] = 0; //обнуление списка подключённых устройств и вкладок
-                       // mainTabControl.TabPages.RemoveAt(p+1);
                     }
                     mainTabControl.TabPages.Clear();
                     TabPage lbPage = new TabPage("ЛБ Концентратор");
@@ -427,29 +415,18 @@ namespace DeviceManagerLKDS
                         var.Byte1 = array[1];
                         query3[2] = var.Byte1;
                         query3[3] = var.Byte0;
+                        query3[query.Length - 3] = 0;
 
-                        /*deviceInfo_thread.Start();*/
 
-                        dr.Send(query3);
-                        
-                        while (dr.setOfBytes == null)
-                        {
-
-                        }
-
-                        rtbLog.Text += DataReader.log_input + DataReader.log_output;
-                        dr.outputBytes = "";
-                        rtbLog.SelectionStart = rtbLog.Text.Length;
-                        rtbLog.ScrollToCaret();
-                        logWriter.AutoFlush = true;
-                        logWriter.Write(rtbLog.Text);
+                        SendQuery(query3);
 
 
 
                         if (dr.setOfBytes[1] != 255)
                         {
                             connectedDevices[j] = dr.setOfBytes[1];
-                            j++;
+                            connectedDevices[j + 1] = bits[i];
+                            j = j + 2;
                         }
                     }
                     rtbLog.Text += "\n\n----------------\nПодключенные устройства:\n";
@@ -463,8 +440,9 @@ namespace DeviceManagerLKDS
                                 if (connectedDevices[o] == (byte)value)
                                 {
                                     TabPage newPage = new TabPage(value.GetNameOfEnum());
+                                    newPage.Name = $"{connectedDevices[o+1]}"; 
                                     mainTabControl.TabPages.Add(newPage);
-                                    rtbLog.Text += $"\n{connectedDevices[o]} - {value.GetNameOfEnum()}";
+                                    rtbLog.Text += $"\n{connectedDevices[o]} - {value.GetNameOfEnum()}. Адрес CAN: {newPage.Name}";
                                 }
                             }
                         }
@@ -473,7 +451,8 @@ namespace DeviceManagerLKDS
                 }
 
             }
-            catch { }
+            catch { }*/
+
             timer1.Start();
 
         }
